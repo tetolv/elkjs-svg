@@ -75,18 +75,15 @@ Renderer.prototype = {
 
   /* Utility methods. */
 
-  // edges can be specified anywhere, there coordinates however are relative
-  //  a) to the source node's parent
-  //  b) the source node, if the target is a descendant of the source node
-  isDescendant(parent, node) {
-    var current = node.id;
-    while (this._parentIds[current]) {
-      current = this._parentIds[current];
-      if (current == parent.id) {
-          return true;
-      }
+  getNodeAncestry(node_id) {
+    const list = [];
+    if (node_id.includes(":")) {
+        node_id = node_id.slice(0, node_id.indexOf(":"));
     }
-    return false;
+    for (; node_id; node_id = this._parentIds[node_id])
+        list.push(node_id);
+    list.reverse();
+    return list;
   },
 
   getOption(e, id) {
@@ -121,18 +118,17 @@ Renderer.prototype = {
     (p.edges || []).forEach((e) => {
       e.sources.forEach(source_id => {
         e.targets.forEach(target_id => {
-          if (source_id.includes(":")) {
-            source_id = source_id.slice(0, source_id.indexOf(":"));
-          }
-          if (!this.isDescendant(source_id, target_id)) {
-            source_id = this._parentIds[source_id];
-          }
-          this._edgeParents[source_id].push(e);
+          // Finding lowest common ancestor(container) of edge source and target nodes. It will contain edge element itself.
+          const source_ancestry = this.getNodeAncestry(source_id);
+          const target_ancestry = this.getNodeAncestry(target_id);
+          for (var i = 0, lca = null; source_ancestry[i] == target_ancestry[i]; i++)
+            lca = target_ancestry[i];
+          this._edgeParents[lca].push(e);
         });
       });
     });
     (p.children || []).forEach(c => this.registerEdges(c));
-  },
+    },
 
   /*
    * Rendering methods.
@@ -196,7 +192,7 @@ Renderer.prototype = {
 
   renderPortsAndLabels(node) {
     var children = [];
-
+    
     if (node.ports) {
       for (const p of node.ports) {
         children.push(this.renderRect(p));
