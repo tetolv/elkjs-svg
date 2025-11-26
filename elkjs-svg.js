@@ -128,7 +128,7 @@ Renderer.prototype = {
       });
     });
     (p.children || []).forEach(c => this.registerEdges(c));
-    },
+  },
 
   /*
    * Rendering methods.
@@ -192,7 +192,7 @@ Renderer.prototype = {
 
   renderPortsAndLabels(node) {
     var children = [];
-    
+
     if (node.ports) {
       for (const p of node.ports) {
         children.push(this.renderRect(p));
