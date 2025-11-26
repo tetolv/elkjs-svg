@@ -121,8 +121,13 @@ Renderer.prototype = {
           // Finding lowest common ancestor(container) of edge source and target nodes. It will contain edge element itself.
           const source_ancestry = this.getNodeAncestry(source_id);
           const target_ancestry = this.getNodeAncestry(target_id);
-          for (var i = 0, lca = null; source_ancestry[i] == target_ancestry[i]; i++)
+          for (var i = 0, lca = null; source_ancestry[i] === target_ancestry[i]; i++) {
+            if (source_ancestry[i] === undefined && target_ancestry[i] == undefined) {
+              lca = target_ancestry[i - 2];
+              break;
+            }
             lca = target_ancestry[i];
+          }
           this._edgeParents[lca].push(e);
         });
       });
