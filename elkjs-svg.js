@@ -216,7 +216,7 @@ Renderer.prototype = {
   },
 
   renderRect(node) {
-    return new Xml("rect", {
+      return new Xml(node.attributes?.element || "rect", {
       ...this.idClass(node, "node"),
       ...this.posSize(node),
       ...this.style(node),
